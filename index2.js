@@ -75,39 +75,56 @@ let primes1k = [
   7703, 7717, 7723, 7727, 7741, 7753, 7757, 7759, 7789, 7793, 7817, 7823, 7829,
   7841, 7853, 7867, 7873, 7877, 7879, 7883, 7901, 7907, 7919,
 ];
-
-let primeNumber1 = 0;
-let primeNumber2 = 0;
+let primeNumber1 = primes1k[12];
+let primeNumber2 = primes1k[300];
 let message;
 let encryptionDecryptionKey;
 let keyPair;
+let encryptionDecryptionKeyPair;
 let encryptingOrDecrypting = 1;
 let talk;
 
-document.getElementById("pp").innerHTML +=
-  " ll " + Math.random().toPrecision(3);
-pq(document.getElementById("name").value, 1);
-pq(document.getElementById("age").value, 0);
-gen(primeNumber1,primeNumber2);
+window.onload = () => {
+  document.getElementById("pp").innerHTML +=
+    " ll " + Math.random().toPrecision(3);
 
-message = talk = document.getElementById("message").value;
+  setPrimeNumber1(
+    generatePrimeFromInput(document.getElementById("name").value)
+  );
+  setPrimeNumber2(generatePrimeFromInput(document.getElementById("age").value));
+
+  encryptionDecryptionKeyPair = generateKeyPair(primeNumber1, primeNumber2);
+
+  message = talk = document.getElementById("message").value;
+
+  document
+    .getElementById("generateKeyPairButton")
+    .addEventListener("click", () => {
+      encryptionDecryptionKeyPair = generateKeyPair(
+        document.getElementById("name"),
+        document.getElementById("age")
+      );
+    });
+};
 
 const setPrimeNumber1 = (prime) => {
+  console.log("spn1:prime=> ", prime);
   primeNumber1 = prime;
 };
 
-const setPrimeNumber2 = (prime) => {
-  if (primeNumber1 == prime) {
+const differentPrime = (prime1, prime2, primeList) => {
+  if (prime1 == prime2) {
     //if prime number 2 is equal to prime number 1
-    primeNumber2 = primes1k[(primes1k.indexOf(prime) + 1) % primes1k.length]; 
+    return primeList[(primeList.indexOf(prime2) + 1) % primeList.length];
     //then pick the next prime number, (index wraps around the end)
-    return;
+  } else {
+    return prime2;
   }
-  primeNumber2 = prime;
 };
 
 const generatePrimeFromInput = (input) => {
   const index = sumCharacterCodes(input);
+  console.log("gpfi:index,iinput=> ", index, input);
   let prime = primes1k[index % primes1k.length];
   return prime;
 };
@@ -115,31 +132,34 @@ const generatePrimeFromInput = (input) => {
 const sumCharacterCodes = (characters) => {
   const codeList = characters.split("");
   const total = codeList.reduce((prev, curr) => {
-    prev += curr.charCodeAt();
-  });
+    return (prev += curr.charCodeAt());
+  }, 0);
   return total;
 };
 
-const gen = (prime1,prime2) => {
+const generateKeyPair = (input1, input2) => {
+  const prime1 = generatePrimeFromInput(input1);
+  const prime2 = generatePrimeFromInput(input2);
+
+  return keyPairgeneratorRSA(prime1, differentPrime(prime1, prime2, primes1k));
+};
+
+const keyPairgeneratorRSA = (prime1, prime2) => {
   console.log("Generating Keys...");
   document.getElementById("keys").innerHTML = "Generating Keys...";
+  /**
+   * N = product of prime 1 and prime 2
+   * T = product of prime1 -1 and prime2 -1
+   * e is a number between 2 and T-1
+   *   is not a multiple of N or T
+   * d is a number between 2 and T/12
+   */
   let N = primeNumber1 * primeNumber2;
   let T = (primeNumber1 - 1) * (primeNumber2 - 1);
-  // console.log("primeNumber1", primeNumber1, "primeNumber2", primeNumber2, "N", N, "T", T)
   for (let e = 2; e < T; e++) {
-    // console.log("Checking e", e)
     if (N % e == 0 || T % e == 0) continue;
-    // console.log("e is coprime with N and T")
     for (let d = 2; d < T / 12; d++) {
-      // console.log("Checking d", d)
       if ((d * e) % T == 1 && e != d && d < 500000) {
-        // console.log("e", e, "D", d, "n", N)
-        console.log(
-          `Key Pair Found: ${[
-            [e, N],
-            [d, N],
-          ]}`
-        );
         document.getElementById(
           "keys"
         ).innerHTML = `public = {${e},${N}} private = {${d},${N}}`;
@@ -150,6 +170,10 @@ const gen = (prime1,prime2) => {
           [d, N],
         ];
         e = T;
+        return {
+          encryptionKey: { key: e, base: N },
+          decryptionKey: { key: d, base: N },
+        };
         break;
       }
     }
@@ -158,9 +182,6 @@ const gen = (prime1,prime2) => {
 
 const ed = (m, k) => {
   edmn(m, k);
-  // edmINT(m,k)
-  //edmo(m,k)
-  //edml(m,k)
 };
 
 const edmn = (m, k) => {
@@ -277,12 +298,14 @@ const edml = (m, k) => {
   return nn;
 };
 
-const edmINT = (m, k) => {
-  //woohoo int in int int out
-  console.log("Starting Encode/Decode...");
-  let key = k.split(",");
-  return (document.getElementById("message").value =
-    message =
-    document.getElementById("output").innerHTML =
-      Number(BigInt(m) ** BigInt(key[0]) % BigInt(key[1])));
-};
+////////
+
+class RSA {
+  constructor() {}
+
+  generateKeyPair = (prime1, prime2) => {};
+
+  encryptMessage = (message) => {};
+
+  decryptMessage = (message) => {};
+}

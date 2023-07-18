@@ -1,0 +1,29 @@
+Key generation
+The keys for the RSA algorithm are generated in the following way:
+
+Choose two large prime numbers p and q.
+To make factoring harder, p and q should be chosen at random, be both large and have a large difference.[1] For choosing them the standard method is to choose random integers and use a primality test until two primes are found.
+p and q should be kept secret.
+Compute n = pq.
+n is used as the modulus for both the public and private keys. Its length, usually expressed in bits, is the key length.
+n is released as part of the public key.
+Compute λ(n), where λ is Carmichael's totient function. Since n = pq, λ(n) = lcm(λ(p), λ(q)), and since p and q are prime, λ(p) = φ(p) = p − 1, and likewise λ(q) = q − 1. Hence λ(n) = lcm(p − 1, q − 1).
+The lcm may be calculated through the Euclidean algorithm, since lcm(a, b) = 
+|ab|
+/
+gcd(a, b)
+.
+λ(n) is kept secret.
+Choose an integer e such that 2 < e < λ(n) and gcd(e, λ(n)) = 1; that is, e and λ(n) are coprime.
+e having a short bit-length and small Hamming weight results in more efficient encryption – the most commonly chosen value for e is 216 + 1 = 65537. The smallest (and fastest) possible value for e is 3, but such a small value for e has been shown to be less secure in some settings.[15]
+e is released as part of the public key.
+Determine d as d ≡ e−1 (mod λ(n)); that is, d is the modular multiplicative inverse of e modulo λ(n).
+This means: solve for d the equation de ≡ 1 (mod λ(n)); d can be computed efficiently by using the extended Euclidean algorithm, since, thanks to e and λ(n) being coprime, said equation is a form of Bézout's identity, where d is one of the coefficients.
+d is kept secret as the private key exponent.
+The public key consists of the modulus n and the public (or encryption) exponent e. The private key consists of the private (or decryption) exponent d, which must be kept secret. p, q, and λ(n) must also be kept secret because they can be used to calculate d. In fact, they can all be discarded after d has been computed.[16]
+
+In the original RSA paper,[1] the Euler totient function φ(n) = (p − 1)(q − 1) is used instead of λ(n) for calculating the private exponent d. Since φ(n) is always divisible by λ(n), the algorithm works as well. The possibility of using Euler totient function results also from Lagrange's theorem applied to the multiplicative group of integers modulo pq. Thus any d satisfying d⋅e ≡ 1 (mod φ(n)) also satisfies d⋅e ≡ 1 (mod λ(n)). However, computing d modulo φ(n) will sometimes yield a result that is larger than necessary (i.e. d > λ(n)). Most of the implementations of RSA will accept exponents generated using either method (if they use the private exponent d at all, rather than using the optimized decryption method based on the Chinese remainder theorem described below), but some standards such as FIPS 186-4 may require that d < λ(n). Any "oversized" private exponents not meeting this criterion may always be reduced modulo λ(n) to obtain a smaller equivalent exponent.
+
+Since any common factors of (p − 1) and (q − 1) are present in the factorisation of n − 1 = pq − 1 = (p − 1)(q − 1) + (p − 1) + (q − 1),[17] it is recommended that (p − 1) and (q − 1) have only very small common factors, if any, besides the necessary 2.[1][18][19][failed verification][20][failed verification]
+
+Note: The authors of the original RSA paper carry out the key generation by choosing d and then computing e as the modular multiplicative inverse of d modulo φ(n), whereas most current implementations of RSA, such as those following PKCS#1, do the reverse (choose e and compute d). Since the chosen key can be small, whereas the computed key normally is not, the RSA paper's algorithm optimizes decryption compared to encryption, while the modern algorithm optimizes encryption instead.[1][21]
