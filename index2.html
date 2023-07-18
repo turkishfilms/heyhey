@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width" />
+    <title>RSA Implementation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous"> 
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <h1 id="title" class="display-4">VBP Key Gen and Encoder/Decoder</h1>
+
+    <input id="name" type="text" value="reginald" class="form-control"></input>
+    <input id="age" type="text" value="22" class="form-control"></input>
+
+    <button type="button" id="generateKeyPairButton" class="btn btn-primary">Generate Key Pair From Name/Age</button>
+
+    <p id="keys"></p>
+    <input type="text" id="message" class="form-control" value="the Message"></input>
+    <input type="text" id="encryptionDecryptionKey" class="form-control"></input>
+    <button type="button" id="encryptButton" class="btn btn-lg btn-success">Encrypt Message</button>
+    <button type="button" id="decryptButton" class="btn btn-lg btn-danger">Decrypt Message</button>
+    <p id="output"></p>
+
+    <script src="index2.js"></script>
+</body>
+</html>

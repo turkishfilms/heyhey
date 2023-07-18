@@ -77,7 +77,7 @@ let primes1k = [
 ];
 
 let encryptionDecryptionKeyPair;
-let cipher;
+let cipherText;
 
 const differentPrime = (prime1, prime2, primeList) => {
   if (prime1 == prime2) {
@@ -153,9 +153,7 @@ const encryptMessage = (message, encryptionKey) => {
         BigInt(encryptionKey.base)
     );
   });
-  let cipher = encodedMessage;
-  console.log("em:cipher=> ", cipher);
-  return cipher;
+  return encodedMessage;
 };
 
 const decryptMessage = (cipher, decryptionKey) => {
@@ -170,7 +168,7 @@ const decryptMessage = (cipher, decryptionKey) => {
     );
   });
 
-  return message.join('')
+  return message.join("");
 };
 
 document
@@ -180,20 +178,18 @@ document
   });
 
 document.getElementById("encryptButton").addEventListener("click", () => {
-  console.log("encypting message");
-  cipher = encryptMessage(
+  cipherText = encryptMessage(
     document.getElementById("message").value,
     encryptionDecryptionKeyPair.encryptionKey
   );
-  document.getElementById("output").textContent = cipher;
+  document.getElementById("output").textContent = cipherText;
 });
 
 document.getElementById("decryptButton").addEventListener("click", () => {
-  console.log("decrypting etc", typeof cipher, cipher);
-  if (!cipher) return;
+  if (!cipherText) return;
 
   const message = decryptMessage(
-    cipher,
+    cipherText,
     encryptionDecryptionKeyPair.decryptionKey
   );
 
