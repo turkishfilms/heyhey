@@ -75,42 +75,9 @@ let primes1k = [
   7703, 7717, 7723, 7727, 7741, 7753, 7757, 7759, 7789, 7793, 7817, 7823, 7829,
   7841, 7853, 7867, 7873, 7877, 7879, 7883, 7901, 7907, 7919,
 ];
-let primeNumber1 = primes1k[12];
-let primeNumber2 = primes1k[300];
-let message;
-let encryptionDecryptionKey;
-let keyPair;
+
 let encryptionDecryptionKeyPair;
-let encryptingOrDecrypting = 1;
-let talk;
-
-window.onload = () => {
-  document.getElementById("pp").innerHTML +=
-    " ll " + Math.random().toPrecision(3);
-
-  setPrimeNumber1(
-    generatePrimeFromInput(document.getElementById("name").value)
-  );
-  setPrimeNumber2(generatePrimeFromInput(document.getElementById("age").value));
-
-  encryptionDecryptionKeyPair = generateKeyPair(primeNumber1, primeNumber2);
-
-  message = talk = document.getElementById("message").value;
-
-  document
-    .getElementById("generateKeyPairButton")
-    .addEventListener("click", () => {
-      encryptionDecryptionKeyPair = generateKeyPair(
-        document.getElementById("name"),
-        document.getElementById("age")
-      );
-    });
-};
-
-const setPrimeNumber1 = (prime) => {
-  console.log("spn1:prime=> ", prime);
-  primeNumber1 = prime;
-};
+let cipher;
 
 const differentPrime = (prime1, prime2, primeList) => {
   if (prime1 == prime2) {
@@ -122,9 +89,15 @@ const differentPrime = (prime1, prime2, primeList) => {
   }
 };
 
+const classicGen = () => {
+  encryptionDecryptionKeyPair = generateKeyPair(
+    document.getElementById("name").value,
+    document.getElementById("age").value
+  );
+};
+
 const generatePrimeFromInput = (input) => {
   const index = sumCharacterCodes(input);
-  console.log("gpfi:index,iinput=> ", index, input);
   let prime = primes1k[index % primes1k.length];
   return prime;
 };
@@ -145,7 +118,6 @@ const generateKeyPair = (input1, input2) => {
 };
 
 const keyPairgeneratorRSA = (prime1, prime2) => {
-  console.log("Generating Keys...");
   document.getElementById("keys").innerHTML = "Generating Keys...";
   /**
    * N = product of prime 1 and prime 2
@@ -154,8 +126,8 @@ const keyPairgeneratorRSA = (prime1, prime2) => {
    *   is not a multiple of N or T
    * d is a number between 2 and T/12
    */
-  let N = primeNumber1 * primeNumber2;
-  let T = (primeNumber1 - 1) * (primeNumber2 - 1);
+  let N = prime1 * prime2;
+  let T = (prime1 - 1) * (prime2 - 1);
   for (let e = 2; e < T; e++) {
     if (N % e == 0 || T % e == 0) continue;
     for (let d = 2; d < T / 12; d++) {
@@ -163,142 +135,70 @@ const keyPairgeneratorRSA = (prime1, prime2) => {
         document.getElementById(
           "keys"
         ).innerHTML = `public = {${e},${N}} private = {${d},${N}}`;
-        document.getElementById("encryptionDecryptionKey").value =
-          encryptionDecryptionKey = `${e},${N}`;
-        keyPair = [
-          [e, N],
-          [d, N],
-        ];
-        e = T;
+        document.getElementById("encryptionDecryptionKey").value = `${e},${N}`;
         return {
           encryptionKey: { key: e, base: N },
           decryptionKey: { key: d, base: N },
         };
-        break;
       }
     }
   }
 };
 
-const ed = (m, k) => {
-  edmn(m, k);
-};
-
-const edmn = (m, k) => {
-  //woohoo uses edmo on a loop to produce original array. (str in int str out) * n
-  let mm = encryptingOrDecrypting ? talk.split("") : talk;
-  let nmn = [];
-  let b = encryptingOrDecrypting;
-  for (let i = 0; i < mm.length; i++) {
-    encryptingOrDecrypting = b;
-    let c = edmo2(mm[i], k);
-    nmn.push(c);
-    talk += c;
-  }
-  encryptingOrDecrypting = b ? 0 : 1;
-  console.log(nmn);
-  talk = null;
-};
-
-const edmo2 = (m, k) => {
-  //woohoo onestr str in int str out
-  console.log("Starting Encode/Decode...");
-  let key = k.split(",");
-  let msg = encryptingOrDecrypting ? m.split("") : 0;
-  let nn;
-  if (encryptingOrDecrypting) {
-    let mnu = msg[0].charCodeAt();
-    console.log("mnu", mnu);
-    nn = Number(BigInt(mnu) ** BigInt(key[0]) % BigInt(key[1]));
-  } else {
-    nn = String.fromCharCode(
-      Number(BigInt(m) ** BigInt(key[0]) % BigInt(key[1]))
+const encryptMessage = (message, encryptionKey) => {
+  const msgCharList = message.split("");
+  const encodedMessage = msgCharList.map((character) => {
+    return Number(
+      BigInt(character.charCodeAt()) ** BigInt(encryptionKey.key) %
+        BigInt(encryptionKey.base)
     );
-  }
-  document.getElementById("message").value =
-    message =
-    document.getElementById("output").innerHTML =
-      nn;
-  console.log("done");
-  // console.log("pre", msg[0].charCodeAt(), "Post")
-  document.getElementById("encryptionDecryptionKey").value =
-    encryptionDecryptionKey = String(keyPair[1]);
-  encryptingOrDecrypting = encryptingOrDecrypting ? 0 : 1; //encryptingOrDecrypting starts at 1
-  return nn;
+  });
+  let cipher = encodedMessage;
+  console.log("em:cipher=> ", cipher);
+  return cipher;
 };
 
-///////////////////////////////////////////////////
-
-const edmo = (m, k) => {
-  //woohoo onestr str in int str out
-  console.log("Starting Encode/Decode...");
-  let key = k.split(",");
-  let msg = encryptingOrDecrypting ? m.split("") : 0;
-  let nn;
-  if (encryptingOrDecrypting) {
-    let mnu = msg[0].charCodeAt();
-    console.log("mnu", mnu);
-    nn = Number(BigInt(mnu) ** BigInt(key[0]) % BigInt(key[1]));
-  } else {
-    nn = String.fromCharCode(
-      Number(BigInt(m) ** BigInt(key[0]) % BigInt(key[1]))
+const decryptMessage = (cipher, decryptionKey) => {
+  //   const cipherCharList = cipher.split("");
+  const cipherCharList = cipher;
+  const message = cipherCharList.map((character) => {
+    return String.fromCharCode(
+      Number(
+        BigInt(character) ** BigInt(decryptionKey.key) %
+          BigInt(decryptionKey.base)
+      )
     );
-  }
-  document.getElementById("message").value =
-    message =
-    document.getElementById("output").innerHTML =
-      nn;
-  console.log("done");
-  // console.log("pre", msg[0].charCodeAt(), "Post")
-  document.getElementById("encryptionDecryptionKey").value =
-    encryptionDecryptionKey = String(keyPair[1]);
-  encryptingOrDecrypting = encryptingOrDecrypting
-    ? 0
-    : 1 / encryptingOrDecrypting;
-  return nn;
+  });
+
+  return message.join('')
 };
 
-const edmn2 = (m, k) => {
-  //woohoo uses edmo on a loop to produce original array. (str in int str out) * n
-  let mm = encryptingOrDecrypting ? m.split("") : m.split(",");
-  let nmn = [];
-  let b = encryptingOrDecrypting;
-  for (let i = 0; i < mm.length; i++) {
-    encryptingOrDecrypting = b;
-    nmn.push(edmo(mm[i], k));
-  }
-  encryptingOrDecrypting = b ? 0 : 1;
-  console.log(nmn);
-};
+document
+  .getElementById("generateKeyPairButton")
+  .addEventListener("click", () => {
+    classicGen();
+  });
 
-const edml = (m, k) => {
-  //str in str str out
-  console.log("Starting Encode/Decode...");
-  let key = k.split(",");
-  let msg = m.split("");
-  let nn;
-  let mnu = msg[0].codePointAt();
-  console.log(msg[0], mnu);
-  let sb = encryptingOrDecrypting ? 0 : 32;
-  let ad = encryptingOrDecrypting ? 32 : 0;
-  nn = String.fromCharCode(
-    (Number(BigInt(mnu - sb) ** BigInt(key[0]) % BigInt(key[1])) % 10750) + ad
+document.getElementById("encryptButton").addEventListener("click", () => {
+  console.log("encypting message");
+  cipher = encryptMessage(
+    document.getElementById("message").value,
+    encryptionDecryptionKeyPair.encryptionKey
   );
-  console.log(nn, nn.codePointAt());
+  document.getElementById("output").textContent = cipher;
+});
 
-  document.getElementById("message").value =
-    message =
-    document.getElementById("output").innerHTML =
-      nn;
-  console.log("done");
-  // console.log("pre", msg[0].charCodeAt(), "Post")
-  document.getElementById("encryptionDecryptionKey").value =
-    encryptionDecryptionKey = String(keyPair[1]);
-  encryptingOrDecrypting = encryptingOrDecrypting ? 0 : 1;
-  return nn;
-};
+document.getElementById("decryptButton").addEventListener("click", () => {
+  console.log("decrypting etc", typeof cipher, cipher);
+  if (!cipher) return;
 
-////////
+  const message = decryptMessage(
+    cipher,
+    encryptionDecryptionKeyPair.decryptionKey
+  );
+
+  document.getElementById("output").textContent = message;
+});
 
 class RSA {
   constructor() {}
